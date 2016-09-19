@@ -1,0 +1,129 @@
+#########################################################
+# Mock LDAP Server powered by Active Directory
+#
+# simulates Active Directory
+#########################################################
+
+
+#########################################################
+# MICROSOFT SCHEMA for "sAMAccountName", "memberOf", "group" and "user"
+# these two attributes are not defined in Apache Directory Server
+#########################################################
+
+version: 1
+
+dn: cn=microsoft, ou=schema
+objectclass: metaSchema
+objectclass: top
+cn: microsoft
+
+dn: ou=attributetypes, cn=microsoft, ou=schema
+objectclass: organizationalUnit
+objectclass: top
+ou: attributetypes
+
+dn: m-oid=1.2.840.113556.1.4.221, ou=attributetypes, cn=microsoft, ou=schema
+objectclass: metaAttributeType
+objectclass: metaTop
+objectclass: top
+m-oid: 1.2.840.113556.1.4.221
+m-name: sAMAccountName
+m-equality: caseIgnoreMatch
+m-syntax: 1.3.6.1.4.1.1466.115.121.1.15
+m-singleValue: TRUE
+
+dn: m-oid=1.2.840.113556.1.4.222, ou=attributetypes, cn=microsoft, ou=schema
+objectclass: metaAttributeType
+objectclass: metaTop
+objectclass: top
+m-oid: 1.2.840.113556.1.4.222
+m-name: memberOf
+m-equality: caseIgnoreMatch
+m-syntax: 1.3.6.1.4.1.1466.115.121.1.15
+m-singleValue: FALSE
+
+dn: ou=objectclasses, cn=microsoft, ou=schema
+objectclass: organizationalUnit
+objectclass: top
+ou: objectClasses
+
+dn: m-oid=1.2.840.113556.1.5.6, ou=objectclasses, cn=microsoft, ou=schema
+objectclass: metaObjectClass
+objectclass: metaTop
+objectclass: top
+m-oid: 1.2.840.113556.1.5.6
+m-name: simulatedMicrosoftSecurityPrincipal
+m-supObjectClass: top
+m-typeObjectClass: AUXILIARY
+m-must: sAMAccountName
+m-may: memberOf
+
+
+dn: m-oid=1.2.840.113556.1.5.7, ou=objectclasses, cn=microsoft, ou=schema
+objectclass: metaObjectClass
+objectclass: metaTop
+objectclass: top
+m-oid: 1.2.840.113556.1.5.7
+m-name: group
+m-supObjectClass: top
+m-typeObjectClass: AUXILIARY
+
+dn: m-oid=1.2.840.113556.1.5.8, ou=objectclasses, cn=microsoft, ou=schema
+objectclass: metaObjectClass
+objectclass: metaTop
+objectclass: top
+m-oid: 1.2.840.113556.1.5.8
+m-name: user
+m-supObjectClass: top
+m-typeObjectClass: AUXILIARY
+
+
+#########################################################
+# user groups
+# These groups are denormalized MANUALLY into user.memberOf array,
+# whether ActiveDirectory maps it automatically based on group membership
+#########################################################
+
+dn: ou=my_users,DC=corp,DC=megacorp,DC=COM
+objectClass: organizationalUnit
+objectClass: top
+ou: my_users
+
+dn: ou=my_groups,DC=corp,DC=megacorp,DC=COM
+objectClass: organizationalUnit
+objectClass: top
+ou: my_groups
+
+dn: cn=group2-users,ou=my_groups,DC=corp,DC=megacorp,DC=COM
+objectclass: top
+objectclass: groupOfNames
+objectClass: group
+cn: group2-users
+member: cn=Denyska,ou=my_users,DC=corp,DC=megacorp,DC=COM
+
+dn: cn=group1-users,ou=my_groups,DC=corp,DC=megacorp,DC=COM
+objectclass: top
+objectclass: groupOfNames
+objectClass: group
+cn: group1-users
+member: cn=Denyska,ou=my_users,DC=corp,DC=megacorp,DC=COM
+
+
+
+#######################################################
+# Employees
+#######################################################
+
+dn: cn=Denyska,ou=my_users,DC=corp,DC=megacorp,DC=COM
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: simulatedMicrosoftSecurityPrincipal
+objectClass: user
+cn: Denyska
+sn: Kurylenko
+mail: denyska@test.com
+MEMBEROF: cn=group1-users,OU=my_groups,DC=corp,DC=megacorp,DC=com
+MEMBEROF: cn=group2-users,OU=my_groups,DC=corp,DC=megacorp,DC=com
+SAMACCOUNTNAME: denyska
